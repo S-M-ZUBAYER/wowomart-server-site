@@ -10,7 +10,8 @@ const API_VERSION_REST = "2025-01";
 const API_VERSION_GRAPHQL = "2024-10";
 const API_TOKEN = process.env.API_TOKEN;
 const GRAPHQL_URL = `https://${SHOPIFY_STORE}/admin/api/${API_VERSION_GRAPHQL}/graphql.json`;
-
+const shopifyDiscountModel = require("../models/shopifyDiscountModel");
+const { deleteShopifyDiscount } = require('../models/shopifyCouponDeleteModel');
 
 const createDiscount = async (req, res) => {
     const { title, percentage, minimumAmount, minimumItem, code, expireDate, segmentQuery, tag = null, segmentId } = req.body;
@@ -331,7 +332,6 @@ const updateTags = async (req, res) => {
     }
 };
 
-const shopifyDiscountModel = require('../models/shopifyDiscountModel'); // adjust path
 
 // GET all segment discounts
 const getAllSegmentDiscounts = async (req, res) => {
@@ -375,6 +375,35 @@ const getCouponsByTag = async (req, res) => {
     }
 };
 
+// controllers/discountController.js
+
+
+const deleteDiscountController = async (req, res) => {
+    try {
+        const { discountId } = req.body;
+        if (!discountId) {
+            return res.status(400).json({
+                success: false,
+                error: "discountId is required.",
+            });
+        }
+
+        const result = await deleteShopifyDiscount(discountId);
+        return res.json({
+            success: true,
+            message: result.message,
+            data: {
+                discount: result,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message || "Something went wrong.",
+        });
+    }
+};
+
 
 
 module.exports = {
@@ -383,5 +412,6 @@ module.exports = {
     updateTags,
     getAllSegmentDiscounts,
     getSegmentDiscountById,
-    getCouponsByTag
+    getCouponsByTag,
+    deleteDiscountController
 };

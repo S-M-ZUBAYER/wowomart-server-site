@@ -31,6 +31,7 @@ const shopifyDiscountModel = {
             );
         });
     },
+
     getByTag: () => {
         return new Promise((resolve, reject) => {
             poolNew.query(

@@ -1,5 +1,6 @@
 // models/CouponUserList.js
 const poolNew = require('../config/db');
+const axios = require("axios");
 
 // Function to convert ISO date to the required format
 const convertDateFormat = (isoDate, newMonth, newDay) => {
@@ -122,6 +123,45 @@ const CouponUserListModel = {
             });
         });
     },
+
+    removeWithUpdate: ({ id, customerId, tag }) => {
+        return new Promise((resolve, reject) => {
+            poolNew.query(
+                'SELECT discountId FROM coupon_user_list WHERE id = ?',
+                [id],
+                async (err, rows) => {
+                    if (err) return reject({ status: 500, message: err.message });
+                    if (rows.length === 0) return reject({ status: 404, message: 'Coupon user not found.' });
+                    try {
+                        // Delete from coupon_user_list
+                        await new Promise((res, rej) => {
+                            poolNew.query('DELETE FROM coupon_user_list WHERE id = ?', [id], (err) => {
+                                if (err) return rej(err);
+                                res();
+                            });
+                        });
+
+
+                        // Call external API
+                        const apiResponse = await axios.post('https://grozziie.zjweiting.com:57683/tht/shopify/update', {
+                            update: 2,
+                            customerId,
+                            tags: tag,
+                        });
+
+                        resolve({
+                            status: 200,
+                            message: 'Deleted and external API updated.',
+                            apiResult: apiResponse.data,
+                        });
+                    } catch (error) {
+                        reject({ status: 500, message: error.message });
+                    }
+                }
+            );
+        });
+    }
+
 };
 
 module.exports = CouponUserListModel;
