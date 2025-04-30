@@ -1,12 +1,23 @@
-const ShopifyProductsModel = require("../models/shopifyProductsModel");
+const { fetchVendors, fetchProducts } = require("../models/shopifyProductsModel");
 
-// Controller to get all Shopify vendor products
+// Utility function
+const handleError = (res, error, message) => {
+    console.error(message, error.message);
+    res.status(500).json({ error: message });
+};
+
+// Controller to fetch all Shopify vendor products
 const getAllShopifyProducts = async (req, res) => {
     try {
-        const vendors = await ShopifyProductsModel.fetchVendors();
+        const vendors = await fetchVendors();
 
         const productsByVendor = await Promise.all(
-            vendors.map((vendor) => ShopifyProductsModel.fetchProducts(vendor))
+            vendors.map((vendor) =>
+                fetchProducts(vendor).catch((error) => {
+                    console.error(`Failed to fetch products for vendor ${vendor}:`, error.message);
+                    return [];
+                })
+            )
         );
 
         const allProducts = productsByVendor.flat();
@@ -18,8 +29,10 @@ const getAllShopifyProducts = async (req, res) => {
             data: allProducts,
         });
     } catch (error) {
-        res.status(400).json({ status: 400, error: err.message });
+        handleError(res, error, "Error fetching Shopify products");
     }
 };
 
-module.exports = { getAllShopifyProducts };
+module.exports = {
+    getAllShopifyProducts,
+};

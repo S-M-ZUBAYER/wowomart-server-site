@@ -10,7 +10,8 @@ const {
     createDiscountForSegment,
     getAllSegmentDiscounts,
     getSegmentDiscountById,
-    getCouponsByTag
+    getCouponsByTag,
+    deleteDiscountController
 } = require('../controllers/shopifyDiscountController');
 
 const router = express.Router();
@@ -27,46 +28,8 @@ router.get('/shopify/segment-discounts', getAllSegmentDiscounts);
 router.get('/shopify/segment-discounts/:id', getSegmentDiscountById);
 
 router.get('/shopify/coupons-by-tag', getCouponsByTag);
+router.post('/shopify/discount/delete', deleteDiscountController);
 
 
 module.exports = router;
 
-
-
-// {
-//     "success": true,
-//         "discount": {
-//         "id": "gid://shopify/DiscountCodeNode/1099959959606",
-//             "codeDiscount": {
-//             "title": "Buy Min Amount, Get 25%",
-//                 "codes": {
-//                 "nodes": [
-//                     {
-//                         "code": "RERERER"
-//                     }
-//                 ]
-//             }
-//         }
-
-
-// {
-//     "success": true,
-//         "segment": {
-//         "id": "gid://shopify/Segment/473212354614",
-//             "name": "Summer Sale 3000% Segment",
-//                 "query": "customer_added_date <= 2025-01-01"
-//     },
-//     "discount": {
-//         "id": "gid://shopify/DiscountCodeNode/1099960254518",
-//             "codeDiscount": {
-//             "title": "Summer Sale 3000%",
-//                 "codes": {
-//                 "nodes": [
-//                     {
-//                         "code": "TTTTER"
-//                     }
-//                 ]
-//             }
-//         }
-//     }
-// }
