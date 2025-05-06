@@ -142,13 +142,13 @@ const createDiscount = async (req, res) => {
 
 
 const createDiscountForSegment = async (req, res) => {
-    const { title, percentage, segmentQuery, code, expireDate, tag } = req.body;
+    const { title, percentage, segmentQuery, discountEnd, code, expireDate, tag } = req.body;
 
     if (!title || !percentage || !code || !expireDate) {
         return res.status(400).json({ error: "Missing title, percentage, code, or expireDate." });
     }
 
-    let Query = tag ? `customer_tags CONTAINS '${tag}'` : segmentQuery;
+    let Query = tag ? `customer_tags CONTAINS '${tag}'` : segmentQuery + discountEnd;
 
     try {
         const segmentMutation = `
@@ -247,12 +247,13 @@ const createDiscountForSegment = async (req, res) => {
 
             connection.query(
                 `INSERT INTO wowomart_segment_discount_create 
-                (title, percentage, segmentQuery, minimumAmount, minimumItem, code, expireDate, tag, segmentId, discountId)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                (title, percentage, segmentQuery, discountEnd, minimumAmount, minimumItem, code, expireDate, tag, segmentId, discountId)
+                VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?)`,
                 [
                     title || null,
                     percentage || null,
                     Query || null,    // Save the used segment query
+                    discountEnd,
                     null,             // minimumAmount is null here
                     null,             // minimumItem is null here
                     savedCode || null,

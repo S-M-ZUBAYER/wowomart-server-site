@@ -17,4 +17,8 @@ router.put('/discountPercent/update/:id', discountController.updateDiscountById)
 // Delete by ID
 router.delete('/discountPercent/delete/:id', discountController.deleteDiscountById);
 
+// Call Post request Delete by ID 
+router.post('/discountPercent/delete/:id', discountController.deleteDiscountById);
+
+
 module.exports = router;
